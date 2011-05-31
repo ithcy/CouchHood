@@ -19,7 +19,12 @@ class CouchDatabase {
       return new CouchDocument($this, array('_id' => $document_id));
       
    }
-   
+   public function create($document){
+     $doc = new CouchDocument($this, $document);
+     $doc->create();
+     return $doc;
+     
+     }
    public function __get($name){
       return $this->get($name);
     }
@@ -50,7 +55,11 @@ class CouchDatabase {
       
       return array_map(array($this, '_as_doc'), $results);
    }
-   
+   public function bulk($docs){
+      $res = CouchNet::POST($this->getUrl()."/_bulk_docs", array("docs" => $docs));
+      return $res;
+     
+    }
    public function createDB(){
       return CouchNet::PUT($this->getUrl()."/");
   }

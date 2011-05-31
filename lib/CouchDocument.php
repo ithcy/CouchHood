@@ -16,11 +16,14 @@ class CouchDocument {
   public function setId($value){ return $this->set("_id", $value);}
   
   public function save(){
-     $res = CouchNet::PUT($this->getUrl(), $this->_data);
-     if ($res['ok'] == true){
+     $url = $this->getUrl();
+     if (!is_null($this->getRev())){
+       $url .= "?rev=" . $this->getRev();
+       }
+     $res = CouchNet::PUT($url, $this->_data);
+
+     if (array_key_exists("id", $res)){
       $this->setRev($res['rev']);
-      $this->setId($res['id']);
-        
      }
      return $this;
   
@@ -29,7 +32,7 @@ class CouchDocument {
      if (!is_null($data)) $this->_data = $data;
      
      $res = CouchNet::POST($this->database->getUrl()."/", $this->_data); 
-     if ( $res['ok'] == true){
+     if ( array_key_exists("id", $res) ){
       $this->setId($res['id']);
       $this->setRev($res['rev']);
     }
@@ -61,14 +64,34 @@ class CouchDocument {
   public function get($name){
       return $this->_data[$name];
   }
+  public function attach($filepath, $name=null, $mime_type=null){
+      $name = is_null($name) ? basename($filepath) : $name ;
+      $a = new CouchAttachment($this, $name);
+      $a->upload($filepath, $name, $mime_type);
+      
+      
+  }
   public function getUrl(){
     return $this->database->getUrl() . "/" . $this->getId();
   
   }  
+  
+  public function detach($name){
+    $url = $this->getUrl()."/".$name."?rev=".$this->getRev();
+    $res = CouchNet::DELETE($url);
+    if (array_key_exists("id", $res)){
+        $this->setRev($res['rev']);
+      unset($this->_data['_attachments'][$name]);
+      }
+    return $this;
+    
+  }
   public function __get($name){
       return $this->get($name);
     
   }
+  
+  
   public function __set($name, $value){
      return $this->set($name, $value);
   }

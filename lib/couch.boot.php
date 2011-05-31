@@ -5,6 +5,8 @@ foreach(array(
    "CouchNet",
    "CouchDatabase",
    "CouchDocument",
-   "CouchView") as $_curr){
+   "CouchView",
+   "CouchAttachment"
+   ) as $_curr){
   require_once(dirname(__FILE__)."/".$_curr.".php");
 }

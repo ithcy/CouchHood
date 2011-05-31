@@ -55,7 +55,13 @@ class TheNet {
     $res->_setOpt(CURLOPT_HTTPHEADER, array('Content-type: application/json', 'Content-length: ' . strlen($payload)));
     $res->_setOpt(CURLOPT_POSTFIELDS, $payload);
     return $res->run();
-    }  
+    }
+  public static function PUT_RAW($url, $payload, $content_type){
+    $res =  call_user_func_array(array('self', 'request'), array($url, "PUT"));
+    $res->_setOpt(CURLOPT_HTTPHEADER, array(sprintf('Content-type: %s', $content_type ), 'Content-length: ' . strlen($payload)));
+    $res->_setOpt(CURLOPT_POSTFIELDS, $payload);
+    return $res->run();
+    }
   public static function COPY($url, $destination){
     $res =  call_user_func_array(array('self', 'request'), array($url, "COPY"));
     
